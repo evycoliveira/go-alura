@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"reflect"
 )
 
 func main() {
+	exibeNomes()
 	exibeIntroducao()
 
 	for {
@@ -69,4 +71,15 @@ func iniciarMonitoramento() {
 	} else {
 		fmt.Println("Site:", site, "está com problemas. Status Code:", resp.StatusCode)
 	}
+}
+
+func exibeNomes() {
+	nomes := []string{"Evelyn", "Amanda", "João"}
+	fmt.Println("O meu slice tem", len(nomes))
+	fmt.Println("O meu slice tem capacidade para", cap(nomes), "itens")
+	// Adicionando um nome ao slice
+	nomes = append(nomes, "Aparecida")
+	fmt.Println(nomes)
+	fmt.Println(reflect.TypeOf(nomes))
+	fmt.Println("O meu slice tem capacidade para", cap(nomes), "itens")
 }

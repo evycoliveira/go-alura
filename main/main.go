@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"reflect"
 )
 
 func main() {
-	exibeNomes()
 	exibeIntroducao()
 
 	for {
@@ -55,12 +53,12 @@ func leComando() int {
 
 func iniciarMonitoramento() {
 	fmt.Println("Monitorando...")
-	var sites [4]string
-	sites[0] = "https://random-status-code.herokuapp.com/"
-	sites[1] = "https://www.alura.com.br/"
-	sites[2] = "https://www.caelum.com.br/"
-
+	sites := []string{"https://random-status-code.herokuapp.com/", "https://www.alura.com.br/", "https://www.caelum.com.br/"}
 	fmt.Println(sites)
+
+	for i := 0; i < len(sites); i++ {
+		fmt.Println(sites[i])
+	}
 
 	site := "https://random-status-code.herokuapp.com/"
 	// Realiza a consulta na URL atribuida a variável
@@ -71,15 +69,4 @@ func iniciarMonitoramento() {
 	} else {
 		fmt.Println("Site:", site, "está com problemas. Status Code:", resp.StatusCode)
 	}
-}
-
-func exibeNomes() {
-	nomes := []string{"Evelyn", "Amanda", "João"}
-	fmt.Println("O meu slice tem", len(nomes))
-	fmt.Println("O meu slice tem capacidade para", cap(nomes), "itens")
-	// Adicionando um nome ao slice
-	nomes = append(nomes, "Aparecida")
-	fmt.Println(nomes)
-	fmt.Println(reflect.TypeOf(nomes))
-	fmt.Println("O meu slice tem capacidade para", cap(nomes), "itens")
 }

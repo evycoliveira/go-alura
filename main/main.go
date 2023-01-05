@@ -2,27 +2,37 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"time"
+)
+
+const (
+	monitoramentos = 3
+	delay          = 5
 )
 
 func main() {
 	exibeIntroducao()
-	exibeMenu()
-	comando := leComando()
 
-	switch comando {
-	case 1:
-		fmt.Println("Monitorando...")
-	case 2:
-		fmt.Println("Exibindo Logs...")
-	case 0:
-		fmt.Println("Saindo do programa")
-		// Indica que o usuário deseja sair com sucesso
-		os.Exit(0)
-	default:
-		fmt.Println("Não conheço esse comando")
-		// Indica que ocorreu uma ação inesperada
-		os.Exit(-1)
+	for {
+		exibeMenu()
+		comando := leComando()
+
+		switch comando {
+		case 1:
+			iniciarMonitoramento()
+		case 2:
+			fmt.Println("Exibindo Logs...")
+		case 0:
+			fmt.Println("Saindo do programa")
+			// Indica que o usuário deseja sair com sucesso
+			os.Exit(0)
+		default:
+			fmt.Println("Não conheço esse comando")
+			// Indica que ocorreu uma ação inesperada
+			os.Exit(-1)
+		}
 	}
 }
 
@@ -43,6 +53,34 @@ func leComando() int {
 	var comandoLido int
 	fmt.Scan(&comandoLido)
 	fmt.Println("O comando escolhido foi", comandoLido)
+	fmt.Println(" ")
 
 	return comandoLido
+}
+
+func iniciarMonitoramento() {
+	fmt.Println("Monitorando...")
+	sites := []string{"https://random-status-code.herokuapp.com/", "https://www.alura.com.br/", "https://www.caelum.com.br/"}
+
+	for i := 0; i < monitoramentos; i++ {
+		for i, site := range sites {
+			fmt.Println("Testando site", i, ":", site)
+			testaSite(site)
+		}
+		// Intervalo de 5 segundos para cada vez que todos os sites são momitorados
+		time.Sleep(delay * time.Second)
+		fmt.Println(" ")
+	}
+	fmt.Println(" ")
+}
+
+func testaSite(site string) {
+	// Realiza a consulta na URL atribuida a variável
+	resp, _ := http.Get(site)
+
+	if resp.StatusCode == 200 {
+		fmt.Println("Site:", site, "foi carregado com sucesso!")
+	} else {
+		fmt.Println("Site:", site, "está com problemas. Status Code:", resp.StatusCode)
+	}
 }

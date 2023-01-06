@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -61,10 +62,11 @@ func leComando() int {
 
 func iniciarMonitoramento() {
 	fmt.Println("Monitorando...")
-	// sites := []string{"https://random-status-code.herokuapp.com/", "https://www.alura.com.br/", "https://www.caelum.com.br/"}
 	sites := leSitesDoArquivo()
 
+	// For para repetição do monitoramento
 	for i := 0; i < monitoramentos; i++ {
+		// For para percorrer a lista de sites
 		for i, site := range sites {
 			fmt.Println("Testando site", i, ":", site)
 			testaSite(site)
@@ -93,12 +95,16 @@ func testaSite(site string) {
 
 func leSitesDoArquivo() []string {
 	var sites []string
-	arquivo, err := os.Open("sites.txt")
+
+	//arquivo, err := os.Open("sites.txt")
+	// Essa função do pacote ioutil traz o conteúdo do arquivo como array de bytes
+	arquivo, err := ioutil.ReadFile("sites.txt")
 
 	if err != nil {
 		fmt.Println("Ocorreu um erro:", err)
 	}
 
-	fmt.Println(arquivo)
+	// Conversão do arquivo de um array de bytes para string
+	fmt.Println(string(arquivo))
 	return sites
 }

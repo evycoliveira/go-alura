@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -96,15 +96,24 @@ func testaSite(site string) {
 func leSitesDoArquivo() []string {
 	var sites []string
 
-	//arquivo, err := os.Open("sites.txt")
+	arquivo, err := os.Open("sites.txt")
 	// Essa função do pacote ioutil traz o conteúdo do arquivo como array de bytes
-	arquivo, err := ioutil.ReadFile("sites.txt")
+	//arquivo, err := ioutil.ReadFile("sites.txt")
 
 	if err != nil {
 		fmt.Println("Ocorreu um erro:", err)
 	}
 
+	// Retorna leitor linha a linha
+	leitor := bufio.NewReader(arquivo)
+	linha, err := leitor.ReadString('\n')
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	fmt.Println(linha)
 	// Conversão do arquivo de um array de bytes para string
-	fmt.Println(string(arquivo))
+	//fmt.Println(string(arquivo))
 	return sites
 }

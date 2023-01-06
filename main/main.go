@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -15,7 +17,6 @@ const (
 
 func main() {
 	exibeIntroducao()
-	leSitesDoArquivo()
 
 	for {
 		exibeMenu()
@@ -55,7 +56,7 @@ func leComando() int {
 	var comandoLido int
 	fmt.Scan(&comandoLido)
 	fmt.Println("O comando escolhido foi", comandoLido)
-	fmt.Println(" ")
+	fmt.Println("")
 
 	return comandoLido
 }
@@ -73,9 +74,9 @@ func iniciarMonitoramento() {
 		}
 		// Intervalo de 5 segundos para cada vez que todos os sites são momitorados
 		time.Sleep(delay * time.Second)
-		fmt.Println(" ")
+		fmt.Println("")
 	}
-	fmt.Println(" ")
+	fmt.Println("")
 }
 
 func testaSite(site string) {
@@ -95,7 +96,6 @@ func testaSite(site string) {
 
 func leSitesDoArquivo() []string {
 	var sites []string
-
 	arquivo, err := os.Open("sites.txt")
 	// Essa função do pacote ioutil traz o conteúdo do arquivo como array de bytes
 	//arquivo, err := ioutil.ReadFile("sites.txt")
@@ -106,13 +106,19 @@ func leSitesDoArquivo() []string {
 
 	// Retorna leitor linha a linha
 	leitor := bufio.NewReader(arquivo)
-	linha, err := leitor.ReadString('\n')
+	for {
+		linha, err := leitor.ReadString('\n')
+		// Retirar espaços no arquivo
+		linha = strings.TrimSpace(linha)
 
-	if err != nil {
-		fmt.Println("Ocorreu um erro:", err)
+		sites = append(sites, linha)
+
+		if err == io.EOF {
+			break
+		}
 	}
-
-	fmt.Println(linha)
+	// Fechar arquivo para liberar do sistema operacional
+	arquivo.Close()
 	// Conversão do arquivo de um array de bytes para string
 	//fmt.Println(string(arquivo))
 	return sites

@@ -4,20 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
 const (
-	monitoramentos = 3
+	monitoramentos = 5
 	delay          = 5
 )
 
 func main() {
 	exibeIntroducao()
-
 	for {
 		exibeMenu()
 		comando := leComando()
@@ -27,6 +28,7 @@ func main() {
 			iniciarMonitoramento()
 		case 2:
 			fmt.Println("Exibindo Logs...")
+			imprimeLogs()
 		case 0:
 			fmt.Println("Saindo do programa")
 			// Indica que o usuário deseja sair com sucesso
@@ -89,8 +91,10 @@ func testaSite(site string) {
 
 	if resp.StatusCode == 200 {
 		fmt.Println("Site:", site, "foi carregado com sucesso!")
+		registraLog(site, true)
 	} else {
 		fmt.Println("Site:", site, "está com problemas. Status Code:", resp.StatusCode)
+		registraLog(site, false)
 	}
 }
 
@@ -122,4 +126,28 @@ func leSitesDoArquivo() []string {
 	// Conversão do arquivo de um array de bytes para string
 	//fmt.Println(string(arquivo))
 	return sites
+}
+
+func registraLog(site string, status bool) {
+	arquivo, err := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE, 0666)
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	arquivo.WriteString(time.Now().Format("02/01/2006 15:04:05") + " - " + site +
+		" - online: " + strconv.FormatBool(status) + "\n")
+	fmt.Println(arquivo)
+	arquivo.Close()
+}
+
+func imprimeLogs() {
+
+	arquivo, err := ioutil.ReadFile("log.txt")
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	fmt.Println(string(arquivo))
 }

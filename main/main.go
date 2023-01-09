@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,7 +18,7 @@ const (
 
 func main() {
 	exibeIntroducao()
-
+	registraLog("site-falso", false)
 	for {
 		exibeMenu()
 		comando := leComando()
@@ -89,8 +90,10 @@ func testaSite(site string) {
 
 	if resp.StatusCode == 200 {
 		fmt.Println("Site:", site, "foi carregado com sucesso!")
+		registraLog(site, true)
 	} else {
 		fmt.Println("Site:", site, "está com problemas. Status Code:", resp.StatusCode)
+		registraLog(site, false)
 	}
 }
 
@@ -122,4 +125,16 @@ func leSitesDoArquivo() []string {
 	// Conversão do arquivo de um array de bytes para string
 	//fmt.Println(string(arquivo))
 	return sites
+}
+
+func registraLog(site string, status bool) {
+	arquivo, err := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE, 0666)
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	arquivo.WriteString(site + " - online: " + strconv.FormatBool(status) + "\n")
+	fmt.Println(arquivo)
+	arquivo.Close()
 }

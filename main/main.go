@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -53,34 +56,70 @@ func leComando() int {
 	var comandoLido int
 	fmt.Scan(&comandoLido)
 	fmt.Println("O comando escolhido foi", comandoLido)
-	fmt.Println(" ")
+	fmt.Println("")
 
 	return comandoLido
 }
 
 func iniciarMonitoramento() {
 	fmt.Println("Monitorando...")
-	sites := []string{"https://random-status-code.herokuapp.com/", "https://www.alura.com.br/", "https://www.caelum.com.br/"}
+	sites := leSitesDoArquivo()
 
+	// For para repetição do monitoramento
 	for i := 0; i < monitoramentos; i++ {
+		// For para percorrer a lista de sites
 		for i, site := range sites {
 			fmt.Println("Testando site", i, ":", site)
 			testaSite(site)
 		}
 		// Intervalo de 5 segundos para cada vez que todos os sites são momitorados
 		time.Sleep(delay * time.Second)
-		fmt.Println(" ")
+		fmt.Println("")
 	}
-	fmt.Println(" ")
+	fmt.Println("")
 }
 
 func testaSite(site string) {
 	// Realiza a consulta na URL atribuida a variável
-	resp, _ := http.Get(site)
+	resp, err := http.Get(site)
+
+	if err != nil {
+		fmt.Println("Ocorreu um errro:", err)
+	}
 
 	if resp.StatusCode == 200 {
 		fmt.Println("Site:", site, "foi carregado com sucesso!")
 	} else {
 		fmt.Println("Site:", site, "está com problemas. Status Code:", resp.StatusCode)
 	}
+}
+
+func leSitesDoArquivo() []string {
+	var sites []string
+	arquivo, err := os.Open("sites.txt")
+	// Essa função do pacote ioutil traz o conteúdo do arquivo como array de bytes
+	//arquivo, err := ioutil.ReadFile("sites.txt")
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	// Retorna leitor linha a linha
+	leitor := bufio.NewReader(arquivo)
+	for {
+		linha, err := leitor.ReadString('\n')
+		// Retirar espaços no arquivo
+		linha = strings.TrimSpace(linha)
+
+		sites = append(sites, linha)
+
+		if err == io.EOF {
+			break
+		}
+	}
+	// Fechar arquivo para liberar do sistema operacional
+	arquivo.Close()
+	// Conversão do arquivo de um array de bytes para string
+	//fmt.Println(string(arquivo))
+	return sites
 }
